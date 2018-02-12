@@ -14,4 +14,4 @@
 #pip install datetime
 #pip install numpy
 
-python ./src/insight_cc_20180211.py #./input/itcont.txt ./input/percentile.txt ./output/repeat_donors.txt
+python ./src/insight_cc_20180211.py ./input/itcont.txt ./input/percentile.txt ./output/repeat_donors.txt
