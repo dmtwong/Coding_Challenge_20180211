@@ -1,0 +1,19 @@
+---
+title: "Readme"
+author: "David Wong"
+date: "February 13, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Readme
+
+```
+- Python 2.7 (IDE: Anaconda) and Windows 10 (Bash on Ubuntu)
+- Python: pip, os,numpy, datetime, and collections are imported 
+- Bash: python-minimal (apt-get update), python-pip (apt install), pip (pip install --upgrade), datetime (pip install), and numpy (pip install)
+- Unit tests for functions are commented out (Starting from line 127)
+```

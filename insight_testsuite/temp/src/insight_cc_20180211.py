@@ -22,7 +22,7 @@ import numpy
 os.getcwd()
 #os.chdir(os.getcwd() + '\\git_projects\\donation-analytics-master\\insight_testsuite\\tests\\test_1\\input')
 #os.chdir(os.getcwd() + '\\Desktop\\src')
-os.chdir("../")
+#os.chdir("../")
 def validate_date(date):
     '''
     Check for invalid zip code; True iff the string is a valid date for mmddyyyy
@@ -86,9 +86,9 @@ sele_var = adv_objs.namedtuple('sele_var', 'CMTE_ID NAME ZIP_CODE TRANSACTION_DT
 prev_don = adv_objs.OrderedDict()
 CMTE_zip_year = adv_objs.OrderedDict()
 #input_file = open(os.getcwd() + '/Desktop/itcont.txt')               
-input_file = open(os.getcwd() + '/temp/input/itcont.txt')
-output_file = open(os.getcwd() +'/temp/output/repeat_donors.txt', 'w+')       
-input_file2 = open(os.getcwd() + '/temp/input/percentile.txt')       
+input_file = open(os.getcwd() + '/input/itcont.txt')
+output_file = open(os.getcwd() +'/output/repeat_donors.txt', 'w+')       
+input_file2 = open(os.getcwd() + '/input/percentile.txt')       
 percentile_taken = input_file2.read()
 ix = percentile_taken.find('\\')
 percentile_taken = int(percentile_taken[:ix])
