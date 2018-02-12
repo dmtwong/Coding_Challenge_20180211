@@ -6,11 +6,14 @@ Created on Sun Feb 11 14:10:44 2018
 """
 
 import os
-import collections 
+import collections as adv_objs
 import datetime
+import numpy
 
 os.getcwd()
 os.chdir(os.getcwd() + '\\git_projects\\donation-analytics-master\\insight_testsuite\\tests\\test_1\\input')
+
+
 
 def validate_date(date):
     try:
@@ -38,14 +41,40 @@ def check_indiv(other_id_n):
     else:
         return False
 
-#### Main
-sele_var = collections.namedtuple('sele_var', \
-                                  'CMTE_ID NAME ZIP_CODE TRANSACTION_DT TRANSACTION_AMT OTHER_ID')
+def ident_repet_donor(NAME, ZIP_CODE):
+    if (NAME, ZIP_CODE) not in prev_don.keys():
+        print NAME, ZIP_CODE, 'donate the first time'
+        return False
+    else:
+        print NAME, ZIP_CODE, 'is repeated donor'
+        return True
+    
+def prev_contrib_zip_yr(CMTE_ID, ZIP_CODE, YEAR):
+    if (ZIP_CODE, YEAR) not in zip_year.keys():
+        print ZIP_CODE, YEAR, ': receive first contribution from this zip code in this year'
+        return False
+    else:
+        print ZIP_CODE, YEAR, ': receive other contribution from this zip dode in this year before'
 
+def emit(CMTE_ID, ZIP_CODE, year, AMT):
+    try:
+        CMTE_zip_year[(tmp_2.CMTE_ID, tmp_2.ZIP_CODE, year_tmp)].extend([AMT])
+    except KeyError:
+        CMTE_zip_year[(tmp_2.CMTE_ID, tmp_2.ZIP_CODE, year_tmp)]= [AMT]
+        
+sele_var = adv_objs.namedtuple('sele_var', 'CMTE_ID NAME ZIP_CODE TRANSACTION_DT \
+                               TRANSACTION_AMT OTHER_ID')
+prev_don = adv_objs.OrderedDict()
+CMTE_zip_year = adv_objs.OrderedDict()
 #input_file = open(os.getcwd() + '/Desktop/itcont.txt')               
-input_file = open(os.getcwd() + '/itcont.txt')       
-output_file = open(os.getcwd() +'/repeat_donors.txt', 'w')
+input_file = open(os.getcwd() + '\\itcont.txt')
+#output_file = open(os.getcwd() +'/repeat_donors.txt', 'w')       
+input_file2 = open(os.getcwd() + '\\percentile.txt')       
+percentile_taken = input_file2.read()
+ix = percentile_taken.find('\\')
+percentile_taken = int(percentile_taken[:ix])
 
+#### Main
 for line in input_file:
     tmp = line.split('|')
     tmp_2 = sele_var(tmp[0], tmp[7], tmp[10], tmp[13], tmp[14], tmp[15])
@@ -54,13 +83,47 @@ for line in input_file:
         validate_zip(tmp_2[2]) == False or
         check_indiv(tmp_2[5]) == False):
         continue
-    tmp_2 = sele_var(tmp_2[0], tmp_2[1], tmp_2[2][:5], tmp[3], tmp_2[4], tmp[5])
-    year_tmp = tmp_2[4][:4]
-    output_file.write(tmp_2.CMTE_ID + '|' + tmp_2.NAME + '|' + tmp_2.ZIP_CODE + '|' 
-                 + tmp_2.TRANSACTION_DT + '|' + tmp_2.TRANSACTION_AMT + 
-                 tmp_2.OTHER_ID + '\n')
-    #output_file.write(str(tmp_2))
+    tmp_2 = sele_var(tmp_2[0], tmp_2[1], tmp_2[2][:5], tmp_2[3], tmp_2[4], tmp_2[5])
+    year_tmp = tmp_2[3][4:]
+    #print year_tmp
+    dono_tmp = (tmp_2.NAME, tmp_2.ZIP_CODE)
+    if ident_repet_donor(tmp_2[1], tmp_2[2]) == True: #
+        prev_don[(tmp_2[1], tmp_2[2])].extend([year_tmp, tmp_2[4]])
+        emit(tmp_2.CMTE_ID, tmp_2.ZIP_CODE, year_tmp, tmp_2.TRANSACTION_AMT)
+        txn_lst = map(int, CMTE_zip_year[(tmp_2.CMTE_ID, tmp_2.ZIP_CODE, year_tmp)])
+        r_percentile = numpy.percentile(txn_lst, percentile_taken, interpolation = 'nearest')
+        tot_contribu = sum(txn_lst)
+        count = len(txn_lst)
+        #CMTE_zip_year[(tmp_2.CMTE_ID, tmp_2.ZIP_CODE, year_tmp)].extend([tmp_2.TRANSACTION_AMT])
+    else:
+        prev_don[(tmp_2[1], tmp_2[2])] = [year_tmp, tmp_2[4]]
+        pass
+    #print type(prev_don[(tmp_2[1], tmp_2[2])])
+    #int_txn_lst = map(int, prev_don[(tmp_2[1], tmp_2[2])])
+    #print (tmp_2.CMTE_ID + '|' + tmp_2.NAME + '|' + tmp_2.ZIP_CODE + '|' 
+     #            + tmp_2.TRANSACTION_DT + '|' + tmp_2.TRANSACTION_AMT + 
+      #           tmp_2.OTHER_ID)
+    #print int_txn_lst 
+    
+    #num_txn = len( int_txn_lst )
+    #tot_txn = sum( int_txn_lst )
+    #print num_txn, tot_txn
+    
+    output_file.write(tmp_2.CMTE_ID + '|' + tmp_2.ZIP_CODE + '|' + year_tmp + '|' 
+                 + r_percentile + '|' + tot_contribu + count + '\n')
+    output_file.write(str(tmp_2))
 output_file.close()
+
+
+C00177436|DEEHAN, WILLIAM N|30004|P|38415
+C00384818|ABBOTT, JOSEPH|02895|P|25015
+C00384516|SABOURIN, JAMES|02895|P|23015
+C00177436|JEROME, CHRISTOPHER|30750|P|38415
+C00384516|ABBOTT, JOSEPH|02895|P|33315
+C00384516|SABOURIN, JAMES|02895|P|38415
+
+C00384516|02895|2018|333|333|1
+C00384516|02895|2018|333|717|2
 
 #### Archived Unit Test ####    
 #### Testing for validate_date()
@@ -159,3 +222,20 @@ for indiv in test_indiv_list:
     if check_indiv(indiv) == False:
         continue
     print 'indiv'
+
+#### Checking for ident_repet_donor()
+dono_tmp =  ('C00384516', '02895')
+ident_repet_donor(dono_tmp[0], dono_tmp[1])
+prev_don[(tmp_2[1], tmp_2[2])] = [tmp_2[4]]
+ident_repet_donor(dono_tmp[0], dono_tmp[1])
+prev_don[(tmp_2[1], tmp_2[2])].extend(['384'])
+prev_don[(tmp_2[1], tmp_2[2])].extend(['123'])
+
+
+int_txn_lst = map(int, zip_pair[(inc.CMTE_ID, inc.ZIP_CODE[:5])])
+
+numpy.percentile(range(101), 30)
+numpy.percentile([1,2,3,4,5,6,7,8,9,10], 30)
+numpy.percentile([1,2,3,4,5,6,7,8,9,10], 30, interpolation = 'nearest')
+numpy.percentile([333], 30, interpolation = 'nearest')
+numpy.percentile([333, 384], 30, interpolation = 'nearest')
