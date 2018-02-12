@@ -5,14 +5,24 @@ Created on Sun Feb 11 14:10:44 2018
 @author: David Wong
 """
 
-import os
-import collections as adv_objs
+import pip
+
+def install(package):
+    pip.main(['install', package])
+
+#if __name__ == '__main__':
+ #   install('os')
+  #  install('collections')
+    
+#import os
+#import collections as adv_objs
 import datetime
 import numpy
 
 os.getcwd()
-os.chdir(os.getcwd() + '\\git_projects\\donation-analytics-master\\insight_testsuite\\tests\\test_1\\input')
-
+#os.chdir(os.getcwd() + '\\git_projects\\donation-analytics-master\\insight_testsuite\\tests\\test_1\\input')
+#os.chdir(os.getcwd() + '\\Desktop\\src')
+os.chdir("../")
 def validate_date(date):
     '''
     Check for invalid zip code; True iff the string is a valid date for mmddyyyy
@@ -76,9 +86,9 @@ sele_var = adv_objs.namedtuple('sele_var', 'CMTE_ID NAME ZIP_CODE TRANSACTION_DT
 prev_don = adv_objs.OrderedDict()
 CMTE_zip_year = adv_objs.OrderedDict()
 #input_file = open(os.getcwd() + '/Desktop/itcont.txt')               
-input_file = open(os.getcwd() + '\\itcont.txt')
-output_file = open(os.getcwd() +'\\repeat_donors.txt', 'w')       
-input_file2 = open(os.getcwd() + '\\percentile.txt')       
+input_file = open(os.getcwd() + '/donation-analytics-master/input/itcont.txt')
+output_file = open(os.getcwd() +'/donation-analytics-master/output/repeat_donors.txt', 'w')       
+input_file2 = open(os.getcwd() + '/donation-analytics-master/input/percentile.txt')       
 percentile_taken = input_file2.read()
 ix = percentile_taken.find('\\')
 percentile_taken = int(percentile_taken[:ix])
@@ -108,7 +118,7 @@ for line in input_file:
         count = len(txn_lst)
         # write it to output file
         output_file.write(tmp_2.CMTE_ID + '|' + tmp_2.ZIP_CODE + '|' + str(year_tmp) + '|' 
-                 + str(r_percentile) + '|' + str(tot_contribu) + '|' + str(count) + '\n')
+                 + str(r_percentile) + '|' + str(tot_contribu) + '|' + str(count))
     else:
         prev_don[(tmp_2[1], tmp_2[2])] = [year_tmp, tmp_2[4]]
         pass
